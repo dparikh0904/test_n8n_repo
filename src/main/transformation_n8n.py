@@ -13,7 +13,7 @@ df = spark.read.json("path/to/movies.json")
 # Display the original schema
 df.printSchema()
 
-# Explode the genres array to create one row per genre
+# Explode the genres array into separate rows for each genre
 df_exploded = df.withColumn("genre", explode(col("genres")))
 
 # Select and transform the relevant fields
@@ -35,4 +35,4 @@ transformed_df.write.parquet("path/to/transformed_movies.parquet", mode="overwri
 spark.stop()
 ```
 
-Please replace `"path/to/movies.json"` and `"path/to/transformed_movies.parquet"` with the correct paths for your input JSON file and where you want the output Parquet file to be saved.
+Make sure to replace `"path/to/movies.json"` and `"path/to/transformed_movies.parquet"` with the actual paths for your JSON input file and where you want to save the output Parquet file.
