@@ -7,16 +7,16 @@ spark = SparkSession.builder \
     .appName("Movie Data Transformation") \
     .getOrCreate()
 
-# Read the JSON file
+# Load the nested JSON data
 df = spark.read.json("path/to/movies.json")
 
 # Display the original schema
 df.printSchema()
 
-# Explode the genres array into multiple rows
+# Explode the genres array to create a row for each genre
 df_exploded = df.withColumn("genre", explode(col("genres")))
 
-# Transform the DataFrame to select relevant fields
+# Select and rename the relevant fields
 transformed_df = df_exploded.select(
     col("id").alias("movie_id"),
     col("title").alias("movie_title"),
@@ -28,11 +28,11 @@ transformed_df = df_exploded.select(
 # Show the transformed DataFrame
 transformed_df.show(truncate=False)
 
-# Write the transformed DataFrame to Parquet format
+# Write the transformed DataFrame to a Parquet file
 transformed_df.write.parquet("path/to/transformed_movies.parquet", mode="overwrite")
 
 # Stop the Spark Session
 spark.stop()
 ```
 
-Replace `"path/to/movies.json"` and `"path/to/transformed_movies.parquet"` with the appropriate file paths for your input JSON and desired output location.
+Make sure to replace `"path/to/movies.json"` and `"path/to/transformed_movies.parquet"` with the actual paths where your input JSON is located and where you want to save the output Parquet file.
