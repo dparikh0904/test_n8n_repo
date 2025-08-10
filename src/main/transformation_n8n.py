@@ -7,7 +7,7 @@ spark = SparkSession.builder \
     .appName("MovieDataTransformation") \
     .getOrCreate()
 
-# Sample nested JSON data (this would typically come from a file or another data source)
+# Sample nested JSON data
 movie_json_data = '''
 [
   {"title": "Movie A", "genres": ["Action", "Adventure"], "id": 1, "revenue": 1000000, "release_date": "2021-01-15"},
