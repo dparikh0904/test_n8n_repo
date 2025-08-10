@@ -1,19 +1,28 @@
-Certainly! Below is a clean, reusable **Terraform script** template that assumes the role `terraform_deploy_role` in AWS account `664091862099`, targets the `eu-west-2` region, and stores Terraform state in the S3 bucket `terraform-scripts-deployment-664091862099`. This template includes a placeholder example resource that you'll replace with your actual application resources.
+Understood that you want a Terraform script that deploys an application into AWS account 664091862099, using the role `terraform_deploy_role`, region `eu-west-2`, and remote state stored in the S3 bucket `terraform-scripts-deployment-664091862099`.
+
+Since you haven't provided specific details about the application, I'll provide a sample Terraform configuration that:
+
+- Configures the backend using S3 bucket `terraform-scripts-deployment-664091862099`
+- Assumes the given role in the target account
+- Targets the `eu-west-2` region
+- Contains a placeholder resource (an S3 bucket) as an example you can replace
 
 ---
 
-### Terraform Script (e.g., `main.tf`)
+## Terraform script (`main.tf`)
 
 ```hcl
 terraform {
   required_version = ">= 1.0"
 
   backend "s3" {
-    bucket         = "terraform-scripts-deployment-664091862099"
-    key            = "application/terraform.tfstate"
-    region         = "eu-west-2"
-    encrypt        = true
-    # dynamodb_table = "terraform-lock-table" # Optional: uncomment if you use DynamoDB for locking
+    bucket  = "terraform-scripts-deployment-664091862099"
+    key     = "app/terraform.tfstate"
+    region  = "eu-west-2"
+    encrypt = true
+
+    # Uncomment if you have a DynamoDB table for state locking
+    # dynamodb_table = "terraform-lock-table"
   }
 }
 
@@ -26,10 +35,9 @@ provider "aws" {
   }
 }
 
-# ===== Replace this example resource block with your application's actual resources =====
-
-resource "aws_s3_bucket" "example_app_bucket" {
-  bucket = "example-app-bucket-664091862099" # Replace with unique bucket name
+# Example resource: S3 bucket as placeholder for your application resources
+resource "aws_s3_bucket" "app_bucket" {
+  bucket = "app-bucket-664091862099-unique" # Change to your actual unique bucket name
   acl    = "private"
 
   tags = {
@@ -41,28 +49,19 @@ resource "aws_s3_bucket" "example_app_bucket" {
 
 ---
 
-### How to use
+## How to proceed:
 
-1. Ensure your current AWS credentials can assume the role `terraform_deploy_role` in account `664091862099`.
-2. The S3 bucket `terraform-scripts-deployment-664091862099` must exist in `eu-west-2` and be accessible.
-3. **Initialize Terraform backend:**
-
-```bash
-terraform init
-```
-
-4. **Plan the deployment:**
-
-```bash
-terraform plan
-```
-
-5. **Apply changes:**
-
-```bash
-terraform apply
-```
+1. Ensure you have permissions to assume `terraform_deploy_role` in AWS account `664091862099`.
+2. Make sure the bucket `terraform-scripts-deployment-664091862099` exists in `eu-west-2`.
+3. (Optional) Create a DynamoDB table for locking and uncomment the `dynamodb_table` line.
+4. Run:
+   ```bash
+   terraform init
+   terraform plan
+   terraform apply
+   ```
+5. Replace the placeholder resource with your actual application infrastructure.
 
 ---
 
-If you want me to generate a script to deploy a specific application resource (e.g., EC2 instance, Lambda, RDS, ECS service), please provide details of the application!
+If you share specific details about your application (e.g., EC2, Lambda, ECS, RDS, etc.), I can generate a full Terraform script for that scenario.
