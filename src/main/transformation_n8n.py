@@ -33,6 +33,6 @@ transformed_df.write.parquet("path/to/transformed_movies.parquet", mode="overwri
 
 # Stop the Spark Session
 spark.stop()
-``` 
+```
 
-Make sure to replace `"path/to/movies.json"` and `"path/to/transformed_movies.parquet"` with the actual paths to your input JSON file and the desired output location for the transformed Parquet file.
+Make sure to replace `"path/to/movies.json"` and `"path/to/transformed_movies.parquet"` with the actual file paths for your JSON input and desired output location for the Parquet file.
