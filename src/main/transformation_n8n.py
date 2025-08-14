@@ -1,6 +1,6 @@
 ```python
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, explode, to_date
+from pyspark.sql.functions import col, explode, to_date, trim
 
 # Create a Spark session
 spark = SparkSession.builder \
@@ -26,6 +26,9 @@ final_df = exploded_genres_df.withColumn(
     "release_date",
     to_date(col("release_date"), "yyyy-MM-dd")  # Adjust format if necessary
 )
+
+# 3. Trim whitespace from the 'genre' column for cleaner output
+final_df = final_df.withColumn("genre", trim(col("genre")))
 
 # Select the necessary columns in the desired order
 transformed_df = final_df.select(
