@@ -1,15 +1,8 @@
-Certainly! Below is an example Terraform script that assumes you want to:
-
-- Use the AWS provider configured to `eu-west-2`
-- Assume the role `terraform_deploy_role` in the AWS account `664091862099`
-- Use a specific S3 bucket `terraform-scripts-deployment-664091862099` for remote state storage (which I'll also configure)
-- Deploy a simple example application (for demonstration, let's say an EC2 instance) under that configuration
-
-You might need to customize the resource part (the application deployment) according to your actual application details.
+Certainly! Below is a sample Terraform configuration that deploys an example application (an EC2 instance as a simple placeholder) into AWS account `664091862099`, assuming the `terraform_deploy_role` in that account, targeting the `eu-west-2` region, and using the S3 bucket `terraform-scripts-deployment-664091862099` for remote state storage.
 
 ---
 
-### Terraform Script: `main.tf`
+### `main.tf`
 
 ```hcl
 terraform {
@@ -19,30 +12,22 @@ terraform {
     bucket = "terraform-scripts-deployment-664091862099"
     key    = "terraform.tfstate"
     region = "eu-west-2"
-    # Optional encrypt and dynamodb table for state locking
     encrypt = true
-    # dynamodb_table = "terraform-locks"  # create if you want state locking
+    # Uncomment and set below if you have a DynamoDB table for state locking
+    # dynamodb_table = "terraform-locks"
   }
 }
 
 provider "aws" {
   region = "eu-west-2"
 
-  # Assume role in the target account
+  # Assume the deployment role in the target account
   assume_role {
     role_arn = "arn:aws:iam::664091862099:role/terraform_deploy_role"
   }
 }
 
-resource "aws_instance" "app_server" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.micro"
-
-  tags = {
-    Name = "TerraformDeployedAppServer"
-  }
-}
-
+# Example Application Deployment: EC2 Ubuntu instance
 data "aws_ami" "ubuntu" {
   most_recent = true
 
@@ -58,33 +43,34 @@ data "aws_ami" "ubuntu" {
 
   owners = ["099720109477"] # Canonical
 }
+
+resource "aws_instance" "app_server" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t3.micro"
+
+  tags = {
+    Name = "TerraformDeployedAppServer"
+  }
+}
 ```
 
 ---
 
-### Explanation:
+### Usage instructions:
 
-1. **Backend**: Uses the S3 bucket `terraform-scripts-deployment-664091862099` in `eu-west-2` to store the state.
+1. **Pre-requisites**:
 
-2. **Provider**:
-    - AWS region: `eu-west-2`
-    - Assumes the role: `terraform_deploy_role` in account `664091862099`.
+   - Ensure the S3 bucket `terraform-scripts-deployment-664091862099` exists in `eu-west-2`.
+   - Ensure your credentials can assume the role `terraform_deploy_role` in AWS account `664091862099`.
+   - Optionally, create a DynamoDB table for state locking and configure it in the backend.
 
-3. **Resource**:
-    - Launches an EC2 instance running the latest Ubuntu 20.04 LTS AMI.
-    - `t3.micro` instance type (free tier eligible).
-
----
-
-### How to Use:
-
-1. Initialize Terraform with the backend:
+2. **Initialize Terraform**:
 
 ```bash
 terraform init
 ```
 
-2. Apply the configuration:
+3. **Apply the configuration**:
 
 ```bash
 terraform apply
@@ -94,11 +80,8 @@ terraform apply
 
 ### Notes:
 
-- Ensure your local environment or CI pipeline credentials have permission to assume the `terraform_deploy_role` in the target account.
-- The S3 bucket `terraform-scripts-deployment-664091862099` must exist and be accessible.
-- You might want to create a DynamoDB table for state locking in the bucket region and add it to the backend config (`dynamodb_table`).
-- Adapt the resource section to your actual application (ECS, Lambda, EKS, etc.)
+- Replace the resource section to deploy your actual application instead of this example EC2 instance.
+- If you want state locking, create and specify a DynamoDB table in the backend section.
+- This basic example assumes you have the necessary permissions and trust relationship set up for the role assumption.
 
----
-
-If you want me to create something more specific (like deploying ECS or Lambda), please provide more details.
+If you want me to generate a script for another kind of resource or application deployment (ECS, Lambda, EKS, etc.), please provide the details.
