@@ -1,11 +1,4 @@
-Certainly! Here's a Terraform script that:
-
-- Configures the AWS provider to deploy in account `664091862099` by assuming the `terraform_deploy_role`
-- Uses the `eu-west-2` region
-- Uses S3 bucket `terraform-scripts-deployment-664091862099` for Terraform state backend
-- Deploys a simple EC2 Ubuntu 22.04 instance as the example "application"
-
----
+Certainly! Here's a minimal Terraform script to deploy an example EC2 instance (as a placeholder for "the application") in AWS account `664091862099` by assuming the role `terraform_deploy_role`, using AWS region `eu-west-2`, and storing Terraform state in the S3 bucket `terraform-scripts-deployment-664091862099`.
 
 ```hcl
 terraform {
@@ -16,7 +9,8 @@ terraform {
     key    = "app/terraform.tfstate"
     region = "eu-west-2"
     encrypt = true
-    # dynamodb_table = "terraform-locks"  # Uncomment and configure if you want state locking
+    # Uncomment and configure if you wish to use DynamoDB for state locking
+    # dynamodb_table = "terraform-locks"
   }
 }
 
@@ -41,7 +35,7 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 
-  owners = ["099720109477"]  # Canonical
+  owners = ["099720109477"] # Canonical account owner ID
 }
 
 resource "aws_instance" "app" {
@@ -49,18 +43,18 @@ resource "aws_instance" "app" {
   instance_type = "t3.micro"
 
   tags = {
-    Name = "TerraformDeployedApp"
+    Name = "Terraform_Deployed_App"
   }
 }
 ```
 
 ---
 
-### Setup instructions
+### Usage Instructions
 
-1. Make sure the S3 bucket `terraform-scripts-deployment-664091862099` exists in `eu-west-2`.
-2. Ensure your current AWS CLI or environment credentials have permission to assume the `terraform_deploy_role` in account `664091862099`.
-3. Run the Terraform commands:
+1. Ensure the S3 bucket `terraform-scripts-deployment-664091862099` exists in the `eu-west-2` region.
+2. Your local AWS credentials (or CI/CD environment) must have permission to assume the role `terraform_deploy_role` in account `664091862099`.
+3. Run:
 
 ```bash
 terraform init
@@ -69,4 +63,4 @@ terraform apply
 
 ---
 
-If you want me to create a script for a more complex app or service (ECS, Lambda, RDS, etc.), just let me know!
+Let me know if you want deployment scripts for specific AWS services or more sophisticated application setups!
