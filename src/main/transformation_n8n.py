@@ -24,10 +24,10 @@ exploded_genres_df = movies_df.select(
 # 2. Convert 'release_date' to a proper date format
 final_df = exploded_genres_df.withColumn(
     "release_date",
-    to_date(col("release_date"), "yyyy-MM-dd")  # Adjust format if necessary
+    to_date(col("release_date"), "yyyy-MM-dd")  # Adjust format as necessary
 )
 
-# Select the necessary columns in the desired order
+# 3. Select and order the necessary columns
 transformed_df = final_df.select(
     "id",
     "title",
