@@ -1,6 +1,6 @@
-Certainly! Here is a concise Terraform script that sets up AWS provider to deploy resources in the AWS account `664091862099` by assuming the role `terraform_deploy_role` using the `eu-west-2` region, and configures the S3 backend with bucket `terraform-scripts-deployment-664091862099`.
+Certainly! Below is a complete Terraform script that configures the AWS provider to deploy resources in AWS account `664091862099` by assuming the role `terraform_deploy_role`. It uses the `eu-west-2` region and stores the Terraform state in the S3 bucket `terraform-scripts-deployment-664091862099`.
 
-Below, I deploy a sample EC2 instance with Ubuntu 22.04 LTS as the example application. Adjust the application resources to your actual needs.
+This example deploys a simple EC2 instance running Ubuntu 22.04 LTS as the application. You can customize the resource section to fit your actual application.
 
 ---
 
@@ -10,10 +10,11 @@ terraform {
 
   backend "s3" {
     bucket = "terraform-scripts-deployment-664091862099"
-    key    = "app-deployment/terraform.tfstate"
+    key    = "app/terraform.tfstate"
     region = "eu-west-2"
     encrypt = true
-    # dynamodb_table = "terraform-locks"  # optional for locking, if setup
+    # Uncomment below if you have DynamoDB locking
+    # dynamodb_table = "terraform-locks"
   }
 }
 
@@ -38,7 +39,7 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 
-  owners = ["099720109477"]
+  owners = ["099720109477"] # Canonical
 }
 
 resource "aws_instance" "app" {
@@ -46,29 +47,37 @@ resource "aws_instance" "app" {
   instance_type = "t3.micro"
 
   tags = {
-    Name = "ExampleAppInstance"
+    Name = "TerraformDeployedApp"
   }
 }
 ```
 
 ---
 
-### Steps to Deploy
+### How to use:
 
-1. Ensure the S3 bucket `terraform-scripts-deployment-664091862099` exists in `eu-west-2`.
-2. Ensure your AWS credentials can assume the given `terraform_deploy_role`.
+1. Make sure the S3 bucket `terraform-scripts-deployment-664091862099` exists in the `eu-west-2` region.
+
+2. Your AWS credentials must have permission to assume the role `terraform_deploy_role` in account `664091862099`.
+
 3. Initialize Terraform:
 
-   ```bash
-   terraform init
-   ```
+```bash
+terraform init
+```
 
-4. Plan and apply:
+4. Preview changes:
 
-   ```bash
-   terraform apply
-   ```
+```bash
+terraform plan
+```
+
+5. Deploy:
+
+```bash
+terraform apply
+```
 
 ---
 
-If you want me to generate a configuration for a specific kind of app (ECS, Lambda, EKS, RDS, etc.), just let me know!
+If you want a specific type of application deployment (like ECS, Lambda, RDS, or EKS), let me know!
