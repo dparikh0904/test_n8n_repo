@@ -1,6 +1,9 @@
-Certainly! Below is a complete Terraform script that configures the AWS provider to deploy resources in AWS account `664091862099` by assuming the role `terraform_deploy_role`. It uses the `eu-west-2` region and stores the Terraform state in the S3 bucket `terraform-scripts-deployment-664091862099`.
+Certainly! Here's a Terraform script that:
 
-This example deploys a simple EC2 instance running Ubuntu 22.04 LTS as the application. You can customize the resource section to fit your actual application.
+- Configures the AWS provider to deploy in account `664091862099` by assuming the `terraform_deploy_role`
+- Uses the `eu-west-2` region
+- Uses S3 bucket `terraform-scripts-deployment-664091862099` for Terraform state backend
+- Deploys a simple EC2 Ubuntu 22.04 instance as the example "application"
 
 ---
 
@@ -13,8 +16,7 @@ terraform {
     key    = "app/terraform.tfstate"
     region = "eu-west-2"
     encrypt = true
-    # Uncomment below if you have DynamoDB locking
-    # dynamodb_table = "terraform-locks"
+    # dynamodb_table = "terraform-locks"  # Uncomment and configure if you want state locking
   }
 }
 
@@ -39,7 +41,7 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 
-  owners = ["099720109477"] # Canonical
+  owners = ["099720109477"]  # Canonical
 }
 
 resource "aws_instance" "app" {
@@ -54,30 +56,17 @@ resource "aws_instance" "app" {
 
 ---
 
-### How to use:
+### Setup instructions
 
-1. Make sure the S3 bucket `terraform-scripts-deployment-664091862099` exists in the `eu-west-2` region.
-
-2. Your AWS credentials must have permission to assume the role `terraform_deploy_role` in account `664091862099`.
-
-3. Initialize Terraform:
+1. Make sure the S3 bucket `terraform-scripts-deployment-664091862099` exists in `eu-west-2`.
+2. Ensure your current AWS CLI or environment credentials have permission to assume the `terraform_deploy_role` in account `664091862099`.
+3. Run the Terraform commands:
 
 ```bash
 terraform init
-```
-
-4. Preview changes:
-
-```bash
-terraform plan
-```
-
-5. Deploy:
-
-```bash
 terraform apply
 ```
 
 ---
 
-If you want a specific type of application deployment (like ECS, Lambda, RDS, or EKS), let me know!
+If you want me to create a script for a more complex app or service (ECS, Lambda, RDS, etc.), just let me know!
