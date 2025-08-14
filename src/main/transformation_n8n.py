@@ -2,37 +2,53 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, explode, to_date
 
-# Initialize Spark Session
+# Initialize Spark session
 spark = SparkSession.builder \
-    .appName("Movie Data Transformation") \
+    .appName("MovieDataTransformation") \
     .getOrCreate()
 
-# Load the nested JSON data
-df = spark.read.json("path/to/movies.json")
+# Sample Input: Replace with your actual JSON file path
+input_json_path = "path/to/movies.json"
 
-# Display the original schema
-df.printSchema()
+# Load the JSON data
+movies_df = spark.read.json(input_json_path)
 
-# Explode the genres array to create a new row for each genre
-df_exploded = df.withColumn("genre", explode(col("genres")))
+# Inspect the schema (optional)
+movies_df.printSchema()
 
-# Select and transform relevant fields
-transformed_df = df_exploded.select(
-    col("id").alias("movie_id"),
-    col("title").alias("movie_title"),
-    col("genre").alias("movie_genre"),
-    col("revenue").cast("double").alias("movie_revenue"),
-    to_date(col("release_date")).alias("movie_release_date")
+# Transformations
+
+# 1. Explode genres into separate rows
+exploded_genres_df = movies_df.select(
+    col("id"),
+    col("title"),
+    explode(col("genres")).alias("genre"),
+    col("revenue"),
+    col("release_date")
 )
 
-# Show the transformed DataFrame
+# 2. Parse release_date to a proper date format
+final_df = exploded_genres_df.withColumn(
+    "release_date",
+    to_date(col("release_date"), "yyyy-MM-dd")  # Adjust the format if necessary
+)
+
+# Select the required columns
+transformed_df = final_df.select(
+    "id",
+    "title",
+    "genre",
+    "revenue",
+    "release_date"
+)
+
+# Show the result (optional)
 transformed_df.show(truncate=False)
 
-# Write the transformed DataFrame to a Parquet file
-transformed_df.write.parquet("path/to/transformed_movies.parquet", mode="overwrite")
+# Write to a new JSON file or any other destination
+output_json_path = "path/to/transformed_movies.json"
+transformed_df.write.json(output_json_path, mode="overwrite")
 
-# Stop the Spark Session
+# Stop the Spark session
 spark.stop()
 ```
-
-Make sure to replace `"path/to/movies.json"` and `"path/to/transformed_movies.parquet"` with the actual paths for your JSON input file and the output location for the transformed Parquet file.
