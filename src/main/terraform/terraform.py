@@ -1,11 +1,4 @@
-Hello! You've asked multiple times for a terraform script to deploy "the application" into AWS account `664091862099` assuming the role `terraform_deploy_role` in `eu-west-2` with S3 backend bucket `terraform-scripts-deployment-664091862099`. Since the actual application specifics haven't been provided yet, I'll create a reusable Terraform template that:
-
-- Assumes the given role in the target AWS account
-- Uses the eu-west-2 region
-- Uses the requested S3 backend
-- Deploys a simple placeholder EC2 instance as an example app deployment
-
----
+Certainly! Below is a Terraform configuration file snippet to deploy an "application" (represented here as an EC2 instance) into AWS account `664091862099` by assuming the role `terraform_deploy_role` in the `eu-west-2` region. It also configures Terraform state backend using the S3 bucket `terraform-scripts-deployment-664091862099`.
 
 ```hcl
 terraform {
@@ -13,10 +6,11 @@ terraform {
 
   backend "s3" {
     bucket = "terraform-scripts-deployment-664091862099"
-    key    = "app/terraform.tfstate"
+    key    = "application/terraform.tfstate"
     region = "eu-west-2"
     encrypt = true
-    # dynamodb_table = "terraform-locks" # Uncomment if you have locking set up
+    # Uncomment for state locking
+    # dynamodb_table = "terraform-locks"
   }
 }
 
@@ -35,7 +29,6 @@ data "aws_ami" "ubuntu" {
     name   = "name"
     values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
   }
-
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
@@ -49,24 +42,16 @@ resource "aws_instance" "app" {
   instance_type = "t3.micro"
 
   tags = {
-    Name = "ExampleApp"
+    Name = "deployed-application"
   }
 }
 ```
 
----
-
-### Instructions
-
-1. Create the S3 bucket `terraform-scripts-deployment-664091862099` (if not present).
-2. Ensure AWS credentials used locally or in CI/CD can assume `terraform_deploy_role` in account `664091862099`.
-3. Initialize and apply:
-
-```bash
-terraform init
-terraform apply
-```
+### How to use:
+1. Make sure the bucket `terraform-scripts-deployment-664091862099` exists in AWS region `eu-west-2`.
+2. Your executing credentials must have permissions to assume the `terraform_deploy_role` role in AWS account `664091862099`.
+3. Run `terraform init` and `terraform apply` to deploy.
 
 ---
 
-If you want me to customize this for a specific application stack (like ECS, Lambda, EKS, RDS, etc.) please share details!
+Please provide details about your specific application (e.g., ECS, Lambda, RDS, etc.) if you want a script beyond this basic EC2 example.
