@@ -1,19 +1,33 @@
-Certainly! I'll provide a reusable Terraform script template that assumes the role `terraform_deploy_role` in AWS account `664091862099` in region `eu-west-2`, using `terraform-scripts-deployment-664091862099` as the S3 backend bucket for terraform state.
-
-As you haven't specified the actual "application" details (whether it's Lambda, ECS, EC2, etc.), I will create a simple example resource: an S3 bucket named uniquely for this setup. You can replace or extend this with your real app configuration.
+Certainly! To create a Terraform script that deploys an application **in AWS account 664091862099**, assumes the **terraform_deploy_role** role in that account to gain permissions, uses the **eu-west-2** region, and stores the Terraform state under the S3 bucket **terraform-scripts-deployment-664091862099**, here's a basic example.
 
 ---
+
+## What the script will do:
+- Configure the **S3 remote backend** to store state.
+- Use the **AWS provider** with **assume_role** to deploy into the target account.
+- Create a simple AWS resource (an S3 bucket) as a placeholder for "application" deployment.
+  
+---
+
+## Terraform Script
 
 ```hcl
 terraform {
   required_version = ">= 1.0"
 
   backend "s3" {
+    # The bucket where Terraform state is stored
     bucket = "terraform-scripts-deployment-664091862099"
+
+    # Path within the bucket to store this app's state file
     key    = "application/terraform.tfstate"
+
     region = "eu-west-2"
+
+    # Enable encryption at rest
     encrypt = true
-    # Uncomment below if you use DynamoDB for state locking
+
+    # Uncomment and set if you use DynamoDB for state locking
     # dynamodb_table = "terraform-locks"
   }
 }
@@ -27,42 +41,53 @@ provider "aws" {
   }
 }
 
+# Example Application Resource: S3 Bucket (replace with your app resources)
 resource "aws_s3_bucket" "app_bucket" {
-  bucket = "example-app-bucket-664091862099-eu-west-2"
-  acl    = "private"
+  bucket = "app-bucket-664091862099-eu-west-2"
+
+  acl = "private"
 
   tags = {
-    Name        = "ExampleAppBucket"
+    Name        = "ApplicationBucket"
     Environment = "Production"
+    ManagedBy   = "Terraform"
   }
 }
 
-output "bucket_name" {
-  description = "The name of the deployed S3 bucket (application)"
-  value       = aws_s3_bucket.app_bucket.bucket
+output "app_bucket_name" {
+  description = "The name of the deployed application bucket"
+  value       = aws_s3_bucket.app_bucket.id
 }
 ```
 
 ---
 
-### Usage
+## Usage Instructions:
 
-1. Make sure the S3 bucket `terraform-scripts-deployment-664091862099` exists in `eu-west-2` (for state storage).
-2. Your local credentials or environment must be able to assume the role `terraform_deploy_role` in account `664091862099`.
-3. Commands:
-
-```bash
-terraform init
-terraform plan
-terraform apply
-```
-
-This configuration will:
-
-- Store terraform state in the specified S3 bucket under `application/terraform.tfstate`.
-- Assume the deploy role in the AWS account.
-- Deploy a sample S3 bucket (replaceable with your application).
+1. Ensure the **S3 bucket** `terraform-scripts-deployment-664091862099` exists in `eu-west-2` (for remote backend state).
+2. Ensure the IAM role **terraform_deploy_role** exists in account `664091862099` and your current AWS credentials allow you to assume it.
+3. Create a directory, e.g., `terraform-app`.
+4. Inside that directory, save the above code as `main.tf`.
+5. Initialize terraform:
+    ```bash
+    terraform init
+    ```
+6. Preview the resources to be created:
+    ```bash
+    terraform plan
+    ```
+7. Apply the deployment:
+    ```bash
+    terraform apply
+    ```
 
 ---
 
-If you provide your actual app details (e.g., ECS, EC2, Lambda, etc.), I can prepare a more focused Terraform script.
+## Notes:
+- Replace the example `aws_s3_bucket.app_bucket` resource with your actual application AWS resources (e.g., ECS, Lambda, EC2 etc.) as required.
+- If you manage state locking, uncomment and configure the DynamoDB lock table in the backend block.
+- The backend bucket and role must be pre-configured beforehand.
+
+---
+
+If you’d like me to generate code for specific AWS services or a real app architecture, please provide the details!
