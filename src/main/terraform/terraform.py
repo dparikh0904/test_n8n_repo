@@ -1,14 +1,11 @@
-Certainly! Here's a complete and reusable Terraform script snippet tailored to your exact requirements:
+Certainly! Below is a complete Terraform configuration that:
 
-- Target AWS Account ID: **664091862099**
-- Assume Role: **terraform_deploy_role**
-- AWS Region: **eu-west-2**
-- Backend S3 bucket for state: **terraform-scripts-deployment-664091862099**
-- Simple example resource deployed under that account (replace with your real app resources)
+- Uses the S3 backend `terraform-scripts-deployment-664091862099` in `eu-west-2` for remote state.
+- Configures the AWS provider to assume the role `terraform_deploy_role` in account `664091862099`.
+- Deploys a simple example resource (an S3 bucket).  
+You can replace the example resource with your actual application resources.
 
 ---
-
-### `main.tf`
 
 ```hcl
 terraform {
@@ -16,10 +13,10 @@ terraform {
 
   backend "s3" {
     bucket = "terraform-scripts-deployment-664091862099"
-    key    = "application/terraform.tfstate"
+    key    = "app/terraform.tfstate"
     region = "eu-west-2"
     encrypt = true
-    # Uncomment below if you have a DynamoDB table for state locking
+    # Uncomment if you use DynamoDB for state locking
     # dynamodb_table = "terraform-locks"
   }
 }
@@ -33,30 +30,28 @@ provider "aws" {
   }
 }
 
-# Replace this resource with your application resources
 resource "aws_s3_bucket" "app_bucket" {
-  bucket = "my-app-bucket-664091862099-eu-west-2"
+  bucket = "app-bucket-664091862099-eu-west-2"
   acl    = "private"
 
   tags = {
-    Project     = "MyApp"
     Environment = "Production"
+    ManagedBy   = "Terraform"
   }
 }
 
 output "app_bucket_name" {
+  description = "Name of the deployed S3 bucket"
   value       = aws_s3_bucket.app_bucket.bucket
-  description = "The name of the deployed application S3 bucket"
 }
 ```
 
 ---
 
-### How to use:
+### Usage
 
-1. Create the S3 bucket `terraform-scripts-deployment-664091862099` in the AWS account/region you use for state.
-2. Confirm that the role `terraform_deploy_role` exists in account `664091862099`, and your user/role can assume it.
-3. Run locally or in your CI/CD environment:
+1. Ensure the backend bucket `terraform-scripts-deployment-664091862099` exists and (optionally) the DynamoDB table for state locking is created.
+2. Run:
 
 ```bash
 terraform init
@@ -64,8 +59,8 @@ terraform plan
 terraform apply
 ```
 
-This will assume the role, deploy the S3 bucket, and store state in the backend bucket.
+Terraform will assume the specified role in account `664091862099` and deploy the resources in `eu-west-2`.
 
 ---
 
-If you want a specific application deployed (ECS, Lambda, etc.), please share details!
+If you want a tailored script for a particular service or application architecture, please provide further details!
