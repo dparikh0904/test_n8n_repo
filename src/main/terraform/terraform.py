@@ -1,10 +1,6 @@
-Certainly! Here’s a Terraform script that:
+Certainly! Below is a clear, minimal Terraform script that assumes the role `terraform_deploy_role` in AWS account `664091862099`, uses the `eu-west-2` region, stores state in the S3 bucket `terraform-scripts-deployment-664091862099`, and deploys a simple example resource as a placeholder (you can customize it for your actual app).
 
-- Uses the S3 backend bucket `terraform-scripts-deployment-664091862099` in the `eu-west-2` region to store Terraform state,
-- Configures the AWS provider to assume the role `terraform_deploy_role` in account `664091862099`,
-- Deploys a simple example resource (an S3 bucket as a placeholder for your application).
-
-Replace the example resource with your actual application as needed.
+---
 
 ```hcl
 terraform {
@@ -15,7 +11,7 @@ terraform {
     key    = "application/terraform.tfstate"
     region = "eu-west-2"
     encrypt = true
-    # Uncomment the following line if you have configured a DynamoDB table for state locking
+    # Uncomment and configure if using DynamoDB locking
     # dynamodb_table = "terraform-locks"
   }
 }
@@ -25,40 +21,40 @@ provider "aws" {
 
   assume_role {
     role_arn     = "arn:aws:iam::664091862099:role/terraform_deploy_role"
-    session_name = "terraform-session"
+    session_name = "tf-session"
   }
 }
 
-resource "aws_s3_bucket" "app_bucket" {
-  bucket = "app-bucket-664091862099-eu-west-2"
+resource "aws_s3_bucket" "application_bucket" {
+  bucket = "application-bucket-664091862099-eu-west-2"
   acl    = "private"
 
   tags = {
-    Name        = "AppBucket"
-    Environment = "Production"
+    Environment = "prod"
+    ManagedBy   = "Terraform"
   }
 }
 
 output "bucket_name" {
-  description = "Name of the application S3 bucket"
-  value       = aws_s3_bucket.app_bucket.bucket
+  description = "Name of the deployed S3 bucket"
+  value       = aws_s3_bucket.application_bucket.id
 }
 ```
 
 ---
 
-### How to use:
+### Instructions:
 
-1. Make sure the bucket `terraform-scripts-deployment-664091862099` exists in `eu-west-2`.
-2. Ensure `terraform_deploy_role` exists in account `664091862099` and your current credentials allow assuming it.
+1. Confirm the backend bucket `terraform-scripts-deployment-664091862099` exists in region `eu-west-2`.
+2. Make sure the role `terraform_deploy_role` exists in AWS account `664091862099` and your credentials allow you to assume it.
 3. Run:
-
-```bash
-terraform init
-terraform plan
-terraform apply
-```
+   ```bash
+   terraform init
+   terraform plan
+   terraform apply
+   ```
+4. You'll get an output of the deployed bucket name.
 
 ---
 
-If you want me to generate the script for a particular AWS service or more complex app setup, just provide details.
+If you want a Terraform script to deploy a specific type of AWS resource (like ECS, Lambda, RDS, etc.), please provide details!
