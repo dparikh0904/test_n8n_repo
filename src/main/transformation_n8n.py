@@ -7,34 +7,34 @@ spark = SparkSession.builder \
     .appName("Movie Data Transformation") \
     .getOrCreate()
 
-# Load the JSON data into a DataFrame (adjust the path as needed)
-json_file_path = "path/to/movies.json"  # Update with the actual path
+# Load the JSON movie data into a DataFrame (adjust the path accordingly)
+json_file_path = "path/to/movies.json"  # Update this path with the actual JSON file location
 movies_df = spark.read.json(json_file_path)
 
-# Display the initial DataFrame schema
+# Display the initial schema of the DataFrame
 movies_df.printSchema()
 
-# Transform the data
+# Transform the dataset
 transformed_df = movies_df.select(
     col("id"),
     col("title"),
-    explode(col("genres")).alias("genre"),
+    explode(col("genres")).alias("genre"),  # Flatten the genres array
     col("revenue"),
-    to_date(col("release_date")).alias("release_date")
-).filter(col("revenue").isNotNull() & (col("revenue") > 0))  # Filter out movies with no or negative revenue
+    to_date(col("release_date")).alias("release_date")  # Convert release_date to DateType
+).filter(col("revenue").isNotNull() & (col("revenue") > 0))  # Filter out rows with null or non-positive revenue
 
 # Display the schema of the transformed DataFrame
 transformed_df.printSchema()
 
-# Show some records from the transformed DataFrame
+# Show the transformed data
 transformed_df.show(truncate=False)
 
-# Write the transformed DataFrame to a new JSON file (adjust the output path as needed)
-output_file_path = "path/to/transformed_movies.json"  # Update with the desired output path
+# Write the transformed DataFrame to a new JSON file (adjust the output path as necessary)
+output_file_path = "path/to/transformed_movies.json"  # Update this path as needed
 transformed_df.write.json(output_file_path, mode='overwrite')
 
 # Stop the Spark session
 spark.stop()
 ```
 
-Make sure to update the `json_file_path` and `output_file_path` with the correct paths for your JSON input file and desired output file location respectively.
+Please ensure to replace `"path/to/movies.json"` and `"path/to/transformed_movies.json"` with your actual file paths for input and output respectively.
