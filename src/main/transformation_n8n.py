@@ -2,41 +2,39 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, explode, to_date
 
-# Create a Spark session
+# Initialize a Spark session
 spark = SparkSession.builder \
     .appName("Movie Data Transformation") \
     .getOrCreate()
 
-# Path to the JSON file (update this path as needed)
-json_file_path = "path/to/movies.json"
-
-# Read the JSON data into a DataFrame
+# Load the JSON data into a DataFrame (specify the path of the JSON file)
+json_file_path = "path/to/movies.json"  # Update with the actual path
 movies_df = spark.read.json(json_file_path)
 
-# Show the initial DataFrame schema
+# Display the initial schema of the DataFrame
 movies_df.printSchema()
 
-# Transformations
+# Transform the data
 transformed_df = movies_df.select(
     col("id"),
     col("title"),
     explode(col("genres")).alias("genre"),
     col("revenue"),
     to_date(col("release_date")).alias("release_date")
-).filter(col("revenue").isNotNull() & (col("revenue") > 0))  # Filter out movies with no revenue
+).filter(col("revenue").isNotNull() & (col("revenue") > 0))  # Filter out entries without revenue
 
-# Show the transformed DataFrame schema
+# Display the schema of the transformed DataFrame
 transformed_df.printSchema()
 
-# Show the first few rows of the transformed DataFrame
+# Show some records from the transformed DataFrame
 transformed_df.show(truncate=False)
 
-# Write the transformed DataFrame to a new JSON file (update this path as needed)
-output_file_path = "path/to/transformed_movies.json"
+# Write the transformed DataFrame to a new JSON file (specify the output path)
+output_file_path = "path/to/transformed_movies.json"  # Update with the desired output path
 transformed_df.write.json(output_file_path, mode='overwrite')
 
 # Stop the Spark session
 spark.stop()
 ```
 
-Make sure to update the `json_file_path` and `output_file_path` with the actual paths where your input JSON file is located and where you want to save the output, respectively.
+Please ensure to replace `"path/to/movies.json"` and `"path/to/transformed_movies.json"` with the actual paths where your input JSON file is located and where you want the output file to be saved, respectively.
