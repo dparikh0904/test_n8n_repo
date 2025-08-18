@@ -4,45 +4,39 @@ from pyspark.sql.functions import col, explode, to_date
 
 # Create a Spark session
 spark = SparkSession.builder \
-    .appName("MovieDataTransformation") \
+    .appName("Movie Data Transformation") \
     .getOrCreate()
 
-# Load the JSON data from the specified file path
-input_json_path = "path/to/movies.json"  # Replace with your actual JSON file path
-movies_df = spark.read.json(input_json_path)
+# Path to the JSON file (update this path as needed)
+json_file_path = "path/to/movies.json"
+
+# Read the JSON data into a DataFrame
+movies_df = spark.read.json(json_file_path)
+
+# Show the initial DataFrame schema
+movies_df.printSchema()
 
 # Transformations
-# 1. Explode the 'genres' column to create a row for each genre
-exploded_genres_df = movies_df.select(
+transformed_df = movies_df.select(
     col("id"),
     col("title"),
     explode(col("genres")).alias("genre"),
     col("revenue"),
-    col("release_date")
-)
+    to_date(col("release_date")).alias("release_date")
+).filter(col("revenue").isNotNull() & (col("revenue") > 0))  # Filter out movies with no revenue
 
-# 2. Convert 'release_date' to a proper date format
-final_df = exploded_genres_df.withColumn(
-    "release_date",
-    to_date(col("release_date"), "yyyy-MM-dd")  # Adjust format as necessary
-)
+# Show the transformed DataFrame schema
+transformed_df.printSchema()
 
-# 3. Select and order the necessary columns
-transformed_df = final_df.select(
-    "id",
-    "title",
-    "genre",
-    "revenue",
-    "release_date"
-)
-
-# Show the transformed DataFrame (optional)
+# Show the first few rows of the transformed DataFrame
 transformed_df.show(truncate=False)
 
-# Write the transformed DataFrame to a JSON file
-output_json_path = "path/to/transformed_movies.json"  # Specify the output path
-transformed_df.write.json(output_json_path, mode="overwrite")
+# Write the transformed DataFrame to a new JSON file (update this path as needed)
+output_file_path = "path/to/transformed_movies.json"
+transformed_df.write.json(output_file_path, mode='overwrite')
 
 # Stop the Spark session
 spark.stop()
 ```
+
+Make sure to update the `json_file_path` and `output_file_path` with the actual paths where your input JSON file is located and where you want to save the output, respectively.
