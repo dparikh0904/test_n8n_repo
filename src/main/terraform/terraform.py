@@ -1,6 +1,15 @@
-Certainly! Below is a clear, minimal Terraform script that assumes the role `terraform_deploy_role` in AWS account `664091862099`, uses the `eu-west-2` region, stores state in the S3 bucket `terraform-scripts-deployment-664091862099`, and deploys a simple example resource as a placeholder (you can customize it for your actual app).
+Sure! Since you repeatedly request a Terraform script to deploy "the application" in AWS account `664091862099` by assuming the `terraform_deploy_role` role, targeting the `eu-west-2` region, and storing state in the S3 bucket `terraform-scripts-deployment-664091862099`, I’ll provide a basic but complete example you can customize.
 
 ---
+
+### Assumptions:
+- You have an S3 bucket named `terraform-scripts-deployment-664091862099` in `eu-west-2` for Terraform remote state.
+- The IAM role `terraform_deploy_role` exists in account 664091862099 and your current credentials can assume it.
+- No specific application details are given, so I'll include a placeholder resource (S3 bucket) to demonstrate deployment.
+
+---
+
+## Complete Terraform Script:
 
 ```hcl
 terraform {
@@ -11,7 +20,7 @@ terraform {
     key    = "application/terraform.tfstate"
     region = "eu-west-2"
     encrypt = true
-    # Uncomment and configure if using DynamoDB locking
+    # Uncomment and specify if you use DynamoDB for state locking
     # dynamodb_table = "terraform-locks"
   }
 }
@@ -21,40 +30,48 @@ provider "aws" {
 
   assume_role {
     role_arn     = "arn:aws:iam::664091862099:role/terraform_deploy_role"
-    session_name = "tf-session"
+    session_name = "terraform_deploy_session"
   }
 }
 
-resource "aws_s3_bucket" "application_bucket" {
-  bucket = "application-bucket-664091862099-eu-west-2"
+resource "aws_s3_bucket" "app_bucket" {
+  bucket = "app-bucket-664091862099-eu-west-2"
   acl    = "private"
 
   tags = {
-    Environment = "prod"
+    Name        = "AppBucket"
+    Environment = "Production"
     ManagedBy   = "Terraform"
   }
 }
 
-output "bucket_name" {
+output "deployed_bucket_name" {
   description = "Name of the deployed S3 bucket"
-  value       = aws_s3_bucket.application_bucket.id
+  value       = aws_s3_bucket.app_bucket.bucket
 }
 ```
 
 ---
 
-### Instructions:
+### How to use:
 
-1. Confirm the backend bucket `terraform-scripts-deployment-664091862099` exists in region `eu-west-2`.
-2. Make sure the role `terraform_deploy_role` exists in AWS account `664091862099` and your credentials allow you to assume it.
+1. Ensure the backend bucket `terraform-scripts-deployment-664091862099` exists in `eu-west-2`.
+2. Place the above code in a file named e.g. `main.tf`.
 3. Run:
    ```bash
    terraform init
    terraform plan
    terraform apply
    ```
-4. You'll get an output of the deployed bucket name.
+
+This will deploy a private S3 bucket named `app-bucket-664091862099-eu-west-2` by assuming the specified IAM role.
 
 ---
 
-If you want a Terraform script to deploy a specific type of AWS resource (like ECS, Lambda, RDS, etc.), please provide details!
+### Next steps:
+
+- Replace resource `aws_s3_bucket.app_bucket` with your actual application infrastructure (e.g., ECS cluster, Lambda, etc.).
+- Add variables, modules, outputs as needed.
+- Configure state locking with DynamoDB if you want to enable concurrency safety.
+
+If you want me to generate Terraform code to deploy a particular app stack or AWS service, please provide those details!
